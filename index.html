@@ -3,110 +3,651 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foundation Week Highlights</title>
+    <title>Crossroads</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #121212;
-            color: #fff;
-            text-align: center;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-        h1 {
-            margin-top: 20px;
+
+        html {
+            scroll-behavior: smooth;
         }
-        .buttons {
-            margin: 20px 0;
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            background-color: #F5F1E8;
+            color: #2C2A27;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            transition: background-color 1.5s ease;
         }
-        .buttons a {
-            text-decoration: none;
-            background: #1e90ff;
-            color: #fff;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 25px;
-            transition: 0.3s;
-            font-family: 'Space Grotesk', "sans-serif";
-        }
-        .buttons a:hover {
-            background: #00bfff;
-        }
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-        }
-        .gallery img {
-            width: 100%;
-            height: 200px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s;
-            cursor: pointer;
-        }
-        .gallery img:hover {
-            transform: scale(1.05);
-        }
-        .modal {
-            display: none;
+
+        /* Loading Animation - 3x3 Grid */
+        .loader {
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background: #F5F1E8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .grid-loader {
+            width: 60px;
+            height: 60px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .grid-cell {
+            background: #2C2A27;
+            opacity: 0;
+            border-radius: 1px;
+            animation: gridPulse 1.6s ease-in-out infinite;
+        }
+
+        .grid-cell:nth-child(1) { animation-delay: 0.0s; }
+        .grid-cell:nth-child(2) { animation-delay: 0.2s; }
+        .grid-cell:nth-child(3) { animation-delay: 0.4s; }
+        .grid-cell:nth-child(4) { animation-delay: 0.1s; }
+        .grid-cell:nth-child(5) { animation-delay: 0.3s; }
+        .grid-cell:nth-child(6) { animation-delay: 0.5s; }
+        .grid-cell:nth-child(7) { animation-delay: 0.2s; }
+        .grid-cell:nth-child(8) { animation-delay: 0.4s; }
+        .grid-cell:nth-child(9) { animation-delay: 0.6s; }
+
+        /* Vignette */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.08) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Grain */
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 2;
+            mix-blend-mode: multiply;
+        }
+
+        /* Starfield - Shows on entire screen but only at bottom */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 3;
+            min-height: 700vh;
+        }
+
+        /* Hero section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            z-index: 4;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
-        .modal img {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 10px;
+
+        .hero.fade-out {
+            opacity: 0;
+            transform: translateY(-20px);
         }
-        .modal.show {
+
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 4.5rem);
+            font-style: italic;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Enhanced byline with better spacing */
+        .byline {
+            font-size: 1.3rem;
+            color: #5A5349;
+            height: 1.5em;
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            font-weight: 400;
+            gap: 8px; /* Added space between "By" and name */
+        }
+
+        .by-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+        }
+
+        .name-container {
+            font-family: 'JetBrains Mono', monospace; /* Changed to JetBrains Mono */
+            font-weight: 400;
+            display: inline-flex;
+            position: relative;
+        }
+
+        .letter {
+            display: inline-block;
+            font-weight: 400;
+            position: relative;
+        }
+
+        /* Clean glitch animation - just opacity flicker */
+        .letter.glitch {
+            animation: flickerGlitch 0.8s ease forwards;
+        }
+
+        /* Content sections */
+        .section {
+            min-height: 100vh;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+            will-change: opacity, transform;
         }
 
-        h1 {font-family: 'Syne', "sans-serif";}
-    </style>
+        .section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-     <!-- FONTS -->
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Syne:wght@400..800&display=swap" rel="stylesheet"> 
+        .line {
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            line-height: 1.6;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        .line.highlight {
+            font-size: clamp(1.7rem, 4.5vw, 2rem);
+            font-weight: 400;
+        }
+
+        /* Final section */
+        .final-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .signature {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            font-style: italic;
+            margin-bottom: 1rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1.2s ease;
+            font-weight: 400;
+        }
+
+        .signature.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .made-with-love {
+            font-size: 0.9rem;
+            color: #5A5349;
+            margin-top: 0.5rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.2s ease 0.3s;
+            font-weight: 400;
+        }
+
+        .made-with-love.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .heart {
+            color: #ff6b6b;
+            display: inline-block;
+            animation: heartbeat 1.8s ease-in-out infinite;
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #5A5349;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-align: center;
+            opacity: 1;
+            transition: opacity 0.8s ease, color 0.8s ease;
+            z-index: 10;
+        }
+
+        .scroll-indicator.hidden {
+            opacity: 0;
+        }
+
+        .mouse {
+            width: 24px;
+            height: 40px;
+            border: 1px solid currentColor;
+            border-radius: 12px;
+            margin: 0 auto 10px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 3px;
+            height: 6px;
+            background: currentColor;
+            border-radius: 2px;
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollBounce 2s ease-in-out infinite;
+        }
+
+        /* Dark mode */
+        body.dark-mode {
+            color: #F5F1E8;
+        }
+
+        body.dark-mode .byline,
+        body.dark-mode .scroll-indicator,
+        body.dark-mode .made-with-love {
+            color: rgba(245, 241, 232, 0.8);
+        }
+
+        body.dark-mode .mouse {
+            border-color: rgba(245, 241, 232, 0.8);
+        }
+
+        body.dark-mode .wheel {
+            background: rgba(245, 241, 232, 0.8);
+        }
+
+        body.dark-mode .grid-cell {
+            background: #F5F1E8;
+        }
+
+        /* Animations */
+        @keyframes gridPulse {
+            0%, 100% { 
+                opacity: 0.1;
+                transform: scale(0.8);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            50% { transform: translateX(-50%) translateY(10px); opacity: 0.6; }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Clean glitch animation - just opacity flicker, no transform */
+        @keyframes flickerGlitch {
+            0% { opacity: 1; }
+            20% { opacity: 0.2; }
+            40% { opacity: 0.8; }
+            60% { opacity: 0.3; }
+            80% { opacity: 0.9; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .line {
+                font-size: 1.4rem;
+            }
+            
+            .line.highlight {
+                font-size: 1.6rem;
+            }
+            
+            .signature {
+                font-size: 1.8rem;
+            }
+            
+            .byline {
+                gap: 6px;
+                font-size: 1.2rem;
+            }
+            
+            .grid-loader {
+                width: 50px;
+                height: 50px;
+                gap: 3px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Foundation Week Highlights</h1>
-    <div class="buttons">
-        <a href="https://www.facebook.com/myEVSU" target="">Eastern Visayas State University</a>
-        <a href="https://www.facebook.com/intelmaincampus" target="">INTEL - EVSU Main Campus</a>
+    <!-- Loading Animation - 3x3 Grid -->
+    <div class="loader" id="loader">
+        <div class="grid-loader">
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+        </div>
     </div>
-    <div class="gallery">
-        <img src="p1.jpeg" alt="Image 1" onclick="openModal(this)">
-        <img src="p2.jpeg" alt="Image 2" onclick="openModal(this)">
-        <img src="p3.jpeg" alt="Image 3" onclick="openModal(this)">
-        <img src="p4.jpeg" alt="Image 4" onclick="openModal(this)">
-        <img src="p5.jpeg" alt="Image 5" onclick="openModal(this)">
-        <img src="p6.jpeg" alt="Image 6" onclick="openModal(this)">
-        <img src="p7.jpeg" alt="Image 7" onclick="openModal(this)">
-        <img src="p8.jpeg" alt="Image 8" onclick="openModal(this)">
-        <img src="p9.jpeg" alt="Image 9" onclick="openModal(this)">
+
+    <!-- Visual effects -->
+    <div class="vignette"></div>
+    <div class="grain"></div>
+    <div class="starfield" id="starfield"></div>
+
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator" id="scrollIndicator">
+        <div class="mouse">
+            <div class="wheel"></div>
+        </div>
+        <div>Scroll</div>
     </div>
-    <div class="modal" id="modal" onclick="closeModal()">
-        <img id="modalImg" src="" alt="Expanded Image">
+
+    <!-- Main content -->
+    <div class="container">
+        <!-- Hero section -->
+        <section class="hero" id="hero">
+            <h1 class="title">Crossroads</h1>
+            <div class="byline" id="byline">
+                <span class="by-text">By</span>
+                <div class="name-container" id="nameContainer">
+                    <span class="letter">M</span>
+                    <span class="letter">o</span>
+                    <span class="letter">z</span>
+                    <span class="letter">a</span>
+                    <span class="letter">r</span>
+                    <span class="letter">t</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Message content -->
+        <div class="content">
+            <!-- Updated message lines -->
+            <div class="section" id="section1">
+                <p class="line">As our college journey comes to an end,</p>
+            </div>
+            
+            <div class="section" id="section2">
+                <p class="line">I want you to know this:</p>
+            </div>
+            
+            <div class="section" id="section3">
+                <p class="line highlight">All those years, I bore witness to every effort you made.</p>
+            </div>
+            
+            <div class="section" id="section4">
+                <p class="line highlight">I saw everything you gave, and I appreciate it more than you could ever know.</p>
+            </div>
+            
+            <div class="section" id="section5">
+                <p class="line">Know that I carry a piece of you with me, wherever I may go.</p>
+            </div>
+            
+            <div class="section" id="section6">
+                <p class="line">I wish you well in life, in love, and in all that lies ahead.</p>
+            </div>
+            
+            <!-- Final section -->
+            <div class="final-section" id="finalSection">
+                <div>
+                    <p class="signature" id="signature">Thank you.</p>
+                    <div class="made-with-love" id="madeWithLove">Made with ‪‪❤︎‬</div>
+                </div>
+            </div>
+        </div>
     </div>
+
     <script>
-        function openModal(img) {
-            document.getElementById("modalImg").src = img.src;
-            document.getElementById("modal").classList.add("show");
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+                initEverything();
+            }, 1800);
+        });
+
+        function initEverything() {
+            window.scrollTo(0, 0);
+            createStarfield();
+            setupNameGlitch();
+            setupScrollAnimations();
         }
-        function closeModal() {
-            document.getElementById("modal").classList.remove("show");
+
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            
+            // Create stars distributed across entire screen (NO shooting stars)
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 0.5;
+                star.style.width = star.style.height = size + 'px';
+                
+                // Stars positioned across entire screen
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                star.style.opacity = Math.random() * 0.5 + 0.2;
+                star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite ${Math.random() * 5}s`;
+                starfield.appendChild(star);
+            }
+            
+            // NO shooting stars - removed entirely
+        }
+
+        function setupNameGlitch() {
+            const nameContainer = document.getElementById('nameContainer');
+            const letters = nameContainer.querySelectorAll('.letter');
+            
+            // Function to perform the clean glitch
+            function performGlitch() {
+                // Add glitch animation to M and z letters only
+                letters[0].classList.add('glitch'); // M
+                letters[2].classList.add('glitch'); // z
+                
+                // After 100ms, change M→B and z→g
+                setTimeout(() => {
+                    letters[0].textContent = 'B'; // M → B
+                    letters[2].textContent = 'g'; // z → g
+                }, 150);
+                
+                // After animation completes (800ms), revert back
+                setTimeout(() => {
+                    letters[0].textContent = 'M';
+                    letters[2].textContent = 'z';
+                    
+                    // Remove glitch class after a brief delay
+                    setTimeout(() => {
+                        letters[0].classList.remove('glitch');
+                        letters[2].classList.remove('glitch');
+                    }, 300);
+                }, 1200);
+            }
+            
+            // Start glitching every 3 seconds
+            setTimeout(() => {
+                performGlitch();
+                setInterval(performGlitch, 3000);
+            }, 2000);
+        }
+
+        function setupScrollAnimations() {
+            const sections = document.querySelectorAll('.section');
+            const hero = document.getElementById('hero');
+            const signature = document.getElementById('signature');
+            const madeWithLove = document.getElementById('madeWithLove');
+            const starfield = document.getElementById('starfield');
+            const scrollIndicator = document.getElementById('scrollIndicator');
+            
+            let ticking = false;
+            let activeSections = new Set();
+            
+            function updateAnimations() {
+                const scrollY = window.scrollY;
+                const windowHeight = window.innerHeight;
+                const maxScroll = document.documentElement.scrollHeight - windowHeight;
+                const scrollPercent = Math.min(scrollY / maxScroll, 1);
+                
+                // Background color transition
+                const startColor = [245, 241, 232];
+                const endColor = [10, 10, 15];
+                
+                const currentColor = startColor.map((start, i) => {
+                    return Math.round(start + (endColor[i] - start) * scrollPercent);
+                });
+                
+                document.body.style.backgroundColor = `rgb(${currentColor.join(',')})`;
+                
+                // Dark mode toggle
+                if (scrollPercent > 0.5) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+                
+                // Fade out hero
+                if (scrollY > windowHeight * 0.3) {
+                    hero.classList.add('fade-out');
+                } else {
+                    hero.classList.remove('fade-out');
+                }
+                
+                // Hide scroll indicator
+                if (scrollY > 50) {
+                    scrollIndicator.classList.add('hidden');
+                } else {
+                    scrollIndicator.classList.remove('hidden');
+                }
+                
+                // STARFIELD ONLY AT BOTTOM (last 10% of scroll)
+                if (scrollPercent > 0.9) {
+                    starfield.style.opacity = '1';
+                    signature.classList.add('active');
+                    madeWithLove.classList.add('active');
+                } else {
+                    starfield.style.opacity = '0';
+                    signature.classList.remove('active');
+                    madeWithLove.classList.remove('active');
+                }
+                
+                // Section visibility
+                const triggerOffset = windowHeight * 0.7;
+                
+                sections.forEach((section, index) => {
+                    const rect = section.getBoundingClientRect();
+                    const isInView = rect.top < triggerOffset && rect.bottom > 0;
+                    
+                    if (isInView) {
+                        if (!activeSections.has(index)) {
+                            activeSections.add(index);
+                            section.classList.add('active');
+                        }
+                    } else {
+                        if (activeSections.has(index)) {
+                            section.classList.remove('active');
+                            activeSections.delete(index);
+                        }
+                    }
+                });
+                
+                ticking = false;
+            }
+            
+            // Throttled scroll handler
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(updateAnimations);
+                    ticking = true;
+                }
+            });
+            
+            // Initial call
+            updateAnimations();
         }
     </script>
 </body>
