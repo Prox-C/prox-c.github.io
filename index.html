@@ -172,7 +172,7 @@
         }
 
         .name-container {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'JetBrains Mono', monospace; /* Changed to JetBrains Mono */
             font-weight: 400;
             display: inline-flex;
             position: relative;
@@ -184,47 +184,25 @@
             position: relative;
         }
 
-        /* Special spans for M and g with enhanced glitch */
-        .glitch-m, .glitch-g {
-            display: inline-block;
-            position: relative;
+        /* Enhanced glitch animation for both directions */
+        .letter.glitch-forward {
+            animation: glitchForward 0.8s ease forwards;
+        }
+        
+        .letter.glitch-reverse {
+            animation: glitchReverse 0.6s ease forwards;
         }
 
-        .glitch-m::before, .glitch-g::before {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-        }
-
-        .glitch-m.glitching, .glitch-g.glitching {
-            animation: enhancedGlitch 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        /* Content sections with enhanced scroll anchoring */
-        .section-anchor {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            opacity: 0;
-            pointer-events: none;
-        }
-
+        /* Content sections */
         .section {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            position: relative;
             opacity: 0;
-            transform: translateY(80px);
-            transition: all 1.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+            transform: translateY(60px);
+            transition: all 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
             will-change: opacity, transform;
         }
 
@@ -233,7 +211,6 @@
             transform: translateY(0);
         }
 
-        /* Enhanced line animations */
         .line {
             font-size: clamp(1.5rem, 4vw, 1.8rem);
             line-height: 1.6;
@@ -241,33 +218,11 @@
             max-width: 800px;
             margin: 0 auto;
             font-weight: 400;
-            position: relative;
-        }
-
-        .line::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%) scaleX(0);
-            width: 60%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #5A5349, transparent);
-            transition: transform 1.2s ease 0.8s;
-        }
-
-        .line.active::after {
-            transform: translateX(-50%) scaleX(1);
         }
 
         .line.highlight {
             font-size: clamp(1.7rem, 4.5vw, 2rem);
             font-weight: 400;
-        }
-
-        .line.highlight::after {
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #2C2A27, transparent);
         }
 
         /* Final section */
@@ -288,8 +243,8 @@
             margin-bottom: 1rem;
             text-align: center;
             opacity: 0;
-            transform: translateY(40px);
-            transition: all 1.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+            transform: translateY(30px);
+            transition: all 1.2s ease;
             font-weight: 400;
         }
 
@@ -305,7 +260,7 @@
             text-align: center;
             opacity: 0;
             transform: translateY(20px);
-            transition: all 1.2s ease 0.5s;
+            transition: all 1.2s ease 0.3s;
             font-weight: 400;
         }
 
@@ -384,14 +339,6 @@
             background: #F5F1E8;
         }
 
-        body.dark-mode .line::after {
-            background: linear-gradient(90deg, transparent, rgba(245, 241, 232, 0.8), transparent);
-        }
-
-        body.dark-mode .line.highlight::after {
-            background: linear-gradient(90deg, transparent, #F5F1E8, transparent);
-        }
-
         /* Animations */
         @keyframes gridPulse {
             0%, 100% { 
@@ -419,31 +366,45 @@
             50% { opacity: 1; }
         }
 
-        /* Enhanced glitch animation for M and g only */
-        @keyframes enhancedGlitch {
-            0% {
+        /* Enhanced glitch animations for both directions */
+        @keyframes glitchForward {
+            0% { 
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                filter: brightness(100%);
+            }
+            25% { 
+                opacity: 0.7;
+                filter: brightness(120%) contrast(140%);
+            }
+            50% { 
+                opacity: 0.3;
+                filter: brightness(80%) contrast(160%);
+            }
+            75% { 
+                opacity: 0.8;
+                filter: brightness(110%) contrast(130%);
+            }
+            100% { 
+                opacity: 1;
                 filter: brightness(100%) contrast(100%);
             }
-            25% {
+        }
+        
+        @keyframes glitchReverse {
+            0% { 
+                opacity: 1;
+                filter: brightness(100%);
+            }
+            33% { 
                 opacity: 0.4;
-                transform: translateY(-3px) scale(1.05);
                 filter: brightness(150%) contrast(180%);
             }
-            50% {
-                opacity: 0.8;
-                transform: translateY(2px) scale(0.95);
+            66% { 
+                opacity: 0.6;
                 filter: brightness(70%) contrast(140%);
             }
-            75% {
-                opacity: 0.3;
-                transform: translateY(-1px) scale(1.02);
-                filter: brightness(130%) contrast(160%);
-            }
-            100% {
+            100% { 
                 opacity: 1;
-                transform: translateY(0) scale(1);
                 filter: brightness(100%) contrast(100%);
             }
         }
@@ -471,10 +432,6 @@
                 width: 50px;
                 height: 50px;
                 gap: 3px;
-            }
-            
-            .line::after {
-                width: 80%;
             }
         }
     </style>
@@ -516,9 +473,9 @@
             <div class="byline" id="byline">
                 <span class="by-text">By</span>
                 <div class="name-container" id="nameContainer">
-                    <span class="glitch-m" id="glitchM">M</span>
+                    <span class="letter">M</span>
                     <span class="letter">o</span>
-                    <span class="glitch-g" id="glitchG">z</span>
+                    <span class="letter">z</span>
                     <span class="letter">a</span>
                     <span class="letter">r</span>
                     <span class="letter">t</span>
@@ -526,50 +483,38 @@
             </div>
         </section>
 
-        <!-- Message content with anchors -->
+        <!-- Message content -->
         <div class="content">
-            <!-- Section 1 -->
-            <div class="section-anchor" id="anchor1"></div>
+            <!-- Updated message lines -->
             <div class="section" id="section1">
-                <p class="line" id="line1">As our college journey comes to an end,</p>
+                <p class="line">As our college journey comes to an end,</p>
             </div>
             
-            <!-- Section 2 -->
-            <div class="section-anchor" id="anchor2"></div>
             <div class="section" id="section2">
-                <p class="line" id="line2">I want you to know this:</p>
+                <p class="line">I want you to know this:</p>
             </div>
             
-            <!-- Section 3 -->
-            <div class="section-anchor" id="anchor3"></div>
             <div class="section" id="section3">
-                <p class="line highlight" id="line3">All those years, I bore witness to every effort you made.</p>
+                <p class="line highlight">All those years, I bore witness to every effort you made.</p>
             </div>
             
-            <!-- Section 4 -->
-            <div class="section-anchor" id="anchor4"></div>
             <div class="section" id="section4">
-                <p class="line highlight" id="line4">I saw everything you gave, and I appreciate it more than you could ever know.</p>
+                <p class="line highlight">I saw everything you gave, and I appreciate it more than you could ever know.</p>
             </div>
             
-            <!-- Section 5 -->
-            <div class="section-anchor" id="anchor5"></div>
             <div class="section" id="section5">
-                <p class="line" id="line5">Know that I carry a piece of you with me, wherever I may go.</p>
+                <p class="line">Know that I carry a piece of you with me, wherever I may go.</p>
             </div>
             
-            <!-- Section 6 -->
-            <div class="section-anchor" id="anchor6"></div>
             <div class="section" id="section6">
-                <p class="line" id="line6">I wish you well in life, in love, and in all that lies ahead.</p>
+                <p class="line">I wish you well in life, in love, and in all that lies ahead.</p>
             </div>
             
             <!-- Final section -->
-            <div class="section-anchor" id="anchorFinal"></div>
             <div class="final-section" id="finalSection">
                 <div>
                     <p class="signature" id="signature">Thank you.</p>
-                    <!-- <div class="made-with-love" id="madeWithLove">Made with <span class="heart">‪‪❤︎‬</span></div> -->
+                    <div class="made-with-love" id="madeWithLove">Made with ‪‪❤︎‬</div>
                 </div>
             </div>
         </div>
@@ -611,45 +556,66 @@
         }
 
         function setupNameGlitch() {
-            const glitchM = document.getElementById('glitchM');
-            const glitchG = document.getElementById('glitchG');
+            const nameContainer = document.getElementById('nameContainer');
+            const letters = nameContainer.querySelectorAll('.letter');
+            
+            // Store original and glitch letters
+            const originalText = ['M', 'o', 'z', 'a', 'r', 't'];
+            const glitchText = ['B', 'o', 'g', 'a', 'r', 't'];
             
             let isGlitched = false;
             
             function performGlitch() {
-                if (isGlitched) {
-                    // Reverse: Bogart → Mozart
-                    glitchM.textContent = 'M';
-                    glitchG.textContent = 'z';
-                } else {
-                    // Forward: Mozart → Bogart
-                    glitchM.textContent = 'B';
-                    glitchG.textContent = 'g';
-                }
+                // Determine direction: glitch forward or reverse
+                const isForward = !isGlitched;
                 
-                // Add glitch animation to both letters
-                glitchM.classList.add('glitching');
-                glitchG.classList.add('glitching');
+                // Add glitch animation to all letters
+                letters.forEach(letter => {
+                    if (isForward) {
+                        letter.classList.add('glitch-forward');
+                    } else {
+                        letter.classList.add('glitch-reverse');
+                    }
+                });
                 
-                // Remove glitch class after animation
+                // Change letters with staggered timing for better effect
                 setTimeout(() => {
-                    glitchM.classList.remove('glitching');
-                    glitchG.classList.remove('glitching');
+                    if (isForward) {
+                        // Forward: Mozart → Bogart
+                        letters[0].textContent = 'B'; // M → B
+                        letters[2].textContent = 'g'; // z → g
+                        // Other letters stay the same
+                    } else {
+                        // Reverse: Bogart → Mozart
+                        letters[0].textContent = 'M'; // B → M
+                        letters[2].textContent = 'z'; // g → z
+                    }
+                }, 200);
+                
+                // Remove glitch class after animation completes
+                setTimeout(() => {
+                    letters.forEach(letter => {
+                        if (isForward) {
+                            letter.classList.remove('glitch-forward');
+                        } else {
+                            letter.classList.remove('glitch-reverse');
+                        }
+                    });
+                    
+                    // Toggle state
                     isGlitched = !isGlitched;
-                }, 500);
+                }, isForward ? 800 : 600); // Different durations for forward/reverse
             }
             
             // Start glitching every 3 seconds
             setTimeout(() => {
-                performGlitch();
-                setInterval(performGlitch, 3000);
+                performGlitch(); // First glitch
+                setInterval(performGlitch, 3000); // Repeat every 3 seconds
             }, 2000);
         }
 
         function setupScrollAnimations() {
             const sections = document.querySelectorAll('.section');
-            const lines = document.querySelectorAll('.line');
-            const anchors = document.querySelectorAll('.section-anchor');
             const hero = document.getElementById('hero');
             const signature = document.getElementById('signature');
             const madeWithLove = document.getElementById('madeWithLove');
@@ -658,40 +624,6 @@
             
             let ticking = false;
             let activeSections = new Set();
-            let currentAnchor = 0;
-            
-            // Set up anchors for snap scrolling
-            const anchorPositions = [];
-            anchors.forEach(anchor => {
-                anchorPositions.push(anchor.offsetTop);
-            });
-            
-            function snapToAnchor() {
-                const scrollY = window.scrollY;
-                const windowHeight = window.innerHeight;
-                
-                // Find the closest anchor
-                let closestAnchor = 0;
-                let minDistance = Infinity;
-                
-                anchorPositions.forEach((pos, index) => {
-                    const distance = Math.abs(pos - scrollY - windowHeight * 0.3);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        closestAnchor = index;
-                    }
-                });
-                
-                // Only snap if we're close to an anchor and not manually scrolling
-                if (minDistance < windowHeight * 0.2 && closestAnchor !== currentAnchor) {
-                    currentAnchor = closestAnchor;
-                    const targetPos = anchorPositions[closestAnchor] - windowHeight * 0.3;
-                    window.scrollTo({
-                        top: targetPos,
-                        behavior: 'smooth'
-                    });
-                }
-            }
             
             function updateAnimations() {
                 const scrollY = window.scrollY;
@@ -741,71 +673,39 @@
                     madeWithLove.classList.remove('active');
                 }
                 
-                // Section visibility with enhanced anchoring
-                const triggerOffset = windowHeight * 0.6;
-                const triggerOffsetTop = windowHeight * 0.4;
+                // Section visibility
+                const triggerOffset = windowHeight * 0.7;
                 
                 sections.forEach((section, index) => {
                     const rect = section.getBoundingClientRect();
-                    const isInView = rect.top < triggerOffset && rect.bottom > triggerOffsetTop;
+                    const isInView = rect.top < triggerOffset && rect.bottom > 0;
                     
                     if (isInView) {
                         if (!activeSections.has(index)) {
                             activeSections.add(index);
                             section.classList.add('active');
-                            // Also activate the corresponding line
-                            if (lines[index]) {
-                                lines[index].classList.add('active');
-                            }
                         }
                     } else {
                         if (activeSections.has(index)) {
                             section.classList.remove('active');
-                            if (lines[index]) {
-                                lines[index].classList.remove('active');
-                            }
                             activeSections.delete(index);
                         }
                     }
                 });
                 
-                // Also activate signature line if in final section
-                const finalSection = document.getElementById('finalSection');
-                const finalRect = finalSection.getBoundingClientRect();
-                if (finalRect.top < windowHeight * 0.7 && finalRect.bottom > 0) {
-                    signature.classList.add('active');
-                    madeWithLove.classList.add('active');
-                }
-                
                 ticking = false;
             }
             
-            // Enhanced scroll handler with debouncing
-            let scrollTimeout;
+            // Throttled scroll handler
             window.addEventListener('scroll', () => {
                 if (!ticking) {
                     requestAnimationFrame(updateAnimations);
                     ticking = true;
                 }
-                
-                // Debounce snap function
-                if (scrollTimeout) {
-                    clearTimeout(scrollTimeout);
-                }
-                scrollTimeout = setTimeout(snapToAnchor, 100);
             });
             
             // Initial call
             updateAnimations();
-            
-            // Recalculate anchor positions on resize
-            window.addEventListener('resize', () => {
-                anchorPositions.length = 0;
-                anchors.forEach(anchor => {
-                    anchorPositions.push(anchor.offsetTop);
-                });
-                updateAnimations();
-            });
         }
     </script>
 </body>
